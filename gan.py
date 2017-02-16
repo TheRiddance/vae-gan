@@ -73,7 +73,7 @@ class GAN:
         d_loss, g_loss = self.sess.run([self.d_loss, self.g_loss], feed_dict={self.input_tensor: input_tensor})
         return d_loss, g_loss
 
-    def generate_and_save_images(self, num_samples, directory, epoch):
+    def generate_and_save_images(self, num_samples, directory, epoch, images):
         # create experiment folder
         experiment_dir = os.path.join(directory, "GAN")
         if not os.path.exists(experiment_dir):

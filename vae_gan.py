@@ -129,7 +129,7 @@ class VAE_GAN:
             self.d_x_p, self.d_x], feed_dict={self.x: x})
         return D_err, G_err, KL_err, LL_err, d_fake, d_real
 
-    def generate_and_save_images(self, x, directory, epoch):
+    def generate_and_save_images(self, num_samples, directory, epoch, x):
         # create experiment folder
         experiment_dir = os.path.join(directory, "VAEGAN")
         if not os.path.exists(experiment_dir):
@@ -141,3 +141,7 @@ class VAE_GAN:
 
         visualizer = ReconstructionVisualizer(experiment_dir, image_size=self.image_size)
         visualizer.save_generated_samples(random_x, recon_x, x, epoch)
+
+    def print_loss(self, x, epoch):
+        D_err, G_err, KL_err, LL_err = self.sess.run([self.D_loss, self.G_loss, self.KL_loss, self.LL_loss], feed_dict={self.x: x})
+        print("epoch: %3d" % epoch, "D loss  %.6f" % D_err, "G loss  %.6f" % G_err, "KL loss  %.6f" % KL_err, "LL loss  %.6f" % LL_err)

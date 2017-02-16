@@ -9,7 +9,7 @@ from visualizer import ImageVisualizer
 
 class VAE:
 
-    def __init__(self, batch_size, hidden_size=256, learning_rate=1e-3, image_size=64):
+    def __init__(self, batch_size, hidden_size=128, learning_rate=1e-3, image_size=64):
         self.image_size = image_size
         self.input_tensor = tf.placeholder(tf.float32, [None, image_size * image_size])
 
@@ -73,7 +73,7 @@ class VAE:
         _, loss, Lx, Lz = self.sess.run([self.optimizer, self.loss, self.Lx, self.Lz], feed_dict={self.input_tensor: input_tensor})
         return loss, Lx, Lz
 
-    def generate_and_save_images(self, num_samples, directory, epoch):
+    def generate_and_save_images(self, num_samples, directory, epoch, images):
         # create experiment folder
         experiment_dir = os.path.join(directory, "VAE")
         if not os.path.exists(experiment_dir):
