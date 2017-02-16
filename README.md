@@ -46,6 +46,6 @@ in your console.
 ### VAE-GAN
 Run
 ```
-python3 train_vae_gan.py
+python3 training.py --model=VAE-GAN
 ```
 in your console.
