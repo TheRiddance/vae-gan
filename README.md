@@ -31,7 +31,7 @@ TODO: support celeb dataset
 ### Vanilla GAN
 Run
 ```
-python3 training.py --model="GAN"
+python3 training.py --model=GAN
 ```
 in your console.
 During training sample images are continously generated.
@@ -39,7 +39,7 @@ During training sample images are continously generated.
 ### Vanilla VAE
 Run
 ```
-python3 training.py --model="VAE"
+python3 training.py --model=VAE
 ```
 in your console.
 
