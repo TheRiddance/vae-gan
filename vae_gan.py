@@ -13,7 +13,7 @@ from visualizer import ReconstructionVisualizer
 
 class VAE_GAN:
 
-    def __init__(self, batch_size, hidden_size, learning_rate=5e-4, image_size=64):
+    def __init__(self, batch_size, hidden_size, e_learning_rate=5e-4, g_learning_rate=5e-4, d_learning_rate=5e-4, image_size=64):
         self.image_size = image_size
 
         self.x = tf.placeholder(tf.float32, [batch_size, image_size * image_size])
@@ -48,10 +48,10 @@ class VAE_GAN:
                                            - tf.exp(tf.clip_by_value(self.z_x_log_sigma_sq, -10.0, 10.0)), 1))/(image_size * image_size)
 
             # Discriminator Loss
-            self.D_loss = tf.reduce_mean(-1.*(tf.log(tf.clip_by_value(self.d_x, 1e-5, 1.0)) + tf.log(tf.clip_by_value(1.0 - self.d_x_p, 1e-5, 1.0))))
+            self.D_loss = tf.reduce_mean(-1. * (tf.log(tf.clip_by_value(self.d_x, 1e-5, 1.0)) + tf.log(tf.clip_by_value(1.0 - self.d_x_p, 1e-5, 1.0))))
 
             # Generator Loss
-            self.G_loss = tf.reduce_mean(-1.*(tf.log(tf.clip_by_value(self.d_x_p, 1e-5, 1.0))))  # + tf.log(tf.clip_by_value(1.0 - d_x,1e-5,1.0))))
+            self.G_loss = tf.reduce_mean(-1. * (tf.log(tf.clip_by_value(self.d_x_p, 1e-5, 1.0))))  # + tf.log(tf.clip_by_value(1.0 - d_x,1e-5,1.0))))
 
             # Lth Layer Loss - the 'learned similarity measure'
             self.LL_loss = tf.reduce_sum(tf.square(l_x - l_x_tilde))/(image_size * image_size)
@@ -71,15 +71,15 @@ class VAE_GAN:
             L_g = tf.clip_by_value(self.LL_loss + self.G_loss, -100, 100)
             L_d = tf.clip_by_value(self.D_loss, -100, 100)
 
-            optimizer_E = tf.train.AdamOptimizer(learning_rate, beta1=0.5)
+            optimizer_E = tf.train.AdamOptimizer(e_learning_rate, epsilon=1.0)
             grads = optimizer_E.compute_gradients(L_e, var_list=E_params)
             self.train_E = optimizer_E.apply_gradients(grads)
 
-            optimizer_G = tf.train.AdamOptimizer(learning_rate, beta1=0.5)
+            optimizer_G = tf.train.AdamOptimizer(g_learning_rate, epsilon=1.0)
             grads = optimizer_G.compute_gradients(L_g, var_list=G_params)
             self.train_G = optimizer_G.apply_gradients(grads)
 
-            optimizer_D = tf.train.AdamOptimizer(learning_rate, beta1=0.5)
+            optimizer_D = tf.train.AdamOptimizer(d_learning_rate, epsilon=1.0)
             grads = optimizer_D.compute_gradients(L_d, var_list=D_params)
             self.train_D = optimizer_D.apply_gradients(grads)
 

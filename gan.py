@@ -9,7 +9,7 @@ from visualizer import ImageVisualizer
 
 class GAN:
 
-    def __init__(self, hidden_size, batch_size, learning_rate=0.001, beta1=0.5, image_size=64):
+    def __init__(self, batch_size, hidden_size=256, learning_rate=1e-3, beta1=0.5, image_size=64):
         self.image_size = image_size
         self.input_tensor = tf.placeholder(tf.float32, [None, image_size * image_size])
 

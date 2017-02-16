@@ -20,7 +20,7 @@ FLAGS = flags.FLAGS
 
 
 def main(_):
-    train_data = hdf5_dataset.read_data_set(FLAGS.samples_dir, image_size=FLAGS.image_size, shape=FLAGS.image_size * FLAGS.image_size, binarized=True).train
+    train_data = hdf5_dataset.read_data_set(FLAGS.samples_dir, image_size=FLAGS.image_size, shape=FLAGS.image_size * FLAGS.image_size, binarized=False).train
 
     model = VAE_GAN(FLAGS.batch_size, FLAGS.hidden_size, FLAGS.learning_rate, image_size=FLAGS.image_size)
 
@@ -31,7 +31,7 @@ def main(_):
         for images in train_data.next_batch(FLAGS.batch_size):
             D_err, G_err, KL_err, LL_err, d_fake, d_real = model.update_params(images)
 
-        print("epoch: %3d" % epoch, "D loss  %.4f" % D_err, "G loss  %.4f" % G_err, "KL loss  %.4f" % KL_err, "LL loss  %.4f" % LL_err)
+        print("epoch: %3d" % epoch, "D loss  %.6f" % D_err, "G loss  %.6f" % G_err, "KL loss  %.6f" % KL_err, "LL loss  %.6f" % LL_err)
 
         if epoch % FLAGS.generation_step == 0:
             model.generate_and_save_images(images, FLAGS.data_dir, epoch)
