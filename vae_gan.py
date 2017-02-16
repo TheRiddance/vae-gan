@@ -13,7 +13,7 @@ from visualizer import ReconstructionVisualizer
 
 class VAE_GAN:
 
-    def __init__(self, batch_size, hidden_size, learning_rate=0.001, image_size=64):
+    def __init__(self, batch_size, hidden_size, learning_rate=5e-4, image_size=64):
         self.image_size = image_size
 
         self.x = tf.placeholder(tf.float32, [batch_size, image_size * image_size])
