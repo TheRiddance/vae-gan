@@ -10,11 +10,12 @@ import hdf5_dataset
 flags = tf.app.flags
 
 flags.DEFINE_string("model", "GAN", "choose a model: GAN or VAE")
-flags.DEFINE_string("samples_dir", "samples/", "sample data dir")
+flags.DEFINE_string("samples_dir", "datasets/", "sample data dir")
 flags.DEFINE_string("data_dir", "data/", "checkpoint and logging data dir")
 flags.DEFINE_integer("batch_size", 128, "batch size")
 flags.DEFINE_integer("image_size", 64, "image size")
 flags.DEFINE_integer("max_epoch", 100, "max epoch")
+flags.DEFINE_integer("hidden_size", 512, "size of latent (feature?) space")
 flags.DEFINE_float("learning_rate", 5e-4, "learning rate")
 flags.DEFINE_integer("generation_step", 5, "generate random images")
 

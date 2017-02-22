@@ -30,7 +30,7 @@ class ImageVisualizer:
         name = "epoch_%03d.png" % epoch
         self._save_image_matrix(image_matrix, name)
 
-        print("generated samples and saved images...")
+        print("generated and saved images...")
 
     def _reconstr_grid(self, x, num_samples, image_size):
         """
@@ -79,7 +79,7 @@ class ReconstructionVisualizer:
         fig.suptitle('Top: random points in z space | Bottom: inputs | Middle: reconstructions')
         plt.savefig(os.path.join(self.experiment_dir, "reonstruction_" + str(epoch) + ".png"))
 
-        print("generated samples and saved images...")
+        print("generated and saved images...")
 
     def _create_image(self, im):
         return np.reshape(im, (self.image_size, self.image_size))

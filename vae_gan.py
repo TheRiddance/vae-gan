@@ -20,6 +20,8 @@ class VAE_GAN:
         self.z_p = tf.random_normal((batch_size, hidden_size), 0, 1)  # normal dist for GAN
         self.eps = tf.random_normal((batch_size, hidden_size), 0, 1)  # normal dist for VAE
 
+        self.global_step = tf.Variable(0, name='global_step', trainable=False)
+
         with tf.variable_scope("encode"):
             self.z_x_mean, self.z_x_log_sigma_sq = self._encoder(self.x, hidden_size)  # get z from the input
 
@@ -73,15 +75,15 @@ class VAE_GAN:
 
             optimizer_E = tf.train.AdamOptimizer(e_learning_rate, epsilon=1.0)
             grads = optimizer_E.compute_gradients(L_e, var_list=E_params)
-            self.train_E = optimizer_E.apply_gradients(grads)
+            self.train_E = optimizer_E.apply_gradients(grads, global_step=self.global_step)
 
             optimizer_G = tf.train.AdamOptimizer(g_learning_rate, epsilon=1.0)
             grads = optimizer_G.compute_gradients(L_g, var_list=G_params)
-            self.train_G = optimizer_G.apply_gradients(grads)
+            self.train_G = optimizer_G.apply_gradients(grads, global_step=self.global_step)
 
             optimizer_D = tf.train.AdamOptimizer(d_learning_rate, epsilon=1.0)
             grads = optimizer_D.compute_gradients(L_d, var_list=D_params)
-            self.train_D = optimizer_D.apply_gradients(grads)
+            self.train_D = optimizer_D.apply_gradients(grads, global_step=self.global_step)
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
@@ -144,4 +146,4 @@ class VAE_GAN:
 
     def print_loss(self, x, epoch):
         D_err, G_err, KL_err, LL_err = self.sess.run([self.D_loss, self.G_loss, self.KL_loss, self.LL_loss], feed_dict={self.x: x})
-        print("epoch: %3d" % epoch, "D loss  %.6f" % D_err, "G loss  %.6f" % G_err, "KL loss  %.6f" % KL_err, "LL loss  %.6f" % LL_err)
+        print("epoch: %3d," % epoch, "D loss: %.6f," % D_err, "G loss: %.6f," % G_err, "KL loss: %.6f," % KL_err, "LL loss: %.6f," % LL_err)
