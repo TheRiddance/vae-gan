@@ -86,6 +86,7 @@ def read_data_set(train_dir, image_size=64, shape=(64, 64), validation=1000, bin
     validation = HDF5_DataSet(train_dir, validation_images)
 
     print('data set loaded:', h5_file)
+    print('dataset size:', len(images))
     print('image size:', image_size)
     print('shape:', shape)
     print('image binarization:', binarized)
@@ -184,8 +185,8 @@ def test_HDF5_Dataset():
 
 
 def test_CelebDataset():
-    c = CelebDataset('/home/ajenal/', image_size=64)
-    c.create_dataset_from_zip('/home/ajenal/celeb_imgs.zip')
+    c = CelebDataset('/home/ajenal/Downloads/', image_size=64)
+    c.create_dataset_from_zip('/home/ajenal/Downloads/img_align_celeba.zip')
 
 if __name__ == '__main__':
     #test_HDF5_Dataset()

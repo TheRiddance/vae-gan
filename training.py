@@ -23,7 +23,7 @@ FLAGS = flags.FLAGS
 
 
 def main(_):
-    train_data = hdf5_dataset.read_data_set(FLAGS.dataset, image_size=FLAGS.image_size, shape=FLAGS.image_size * FLAGS.image_size, binarized=False).train
+    train_data = hdf5_dataset.read_data_set(FLAGS.dataset, image_size=FLAGS.image_size, shape=FLAGS.image_size * FLAGS.image_size, binarized=False, validation=0).train
 
     if FLAGS.model == "VAE":
         model = VAE(FLAGS.hidden_size, FLAGS.batch_size, FLAGS.learning_rate, image_size=FLAGS.image_size)
