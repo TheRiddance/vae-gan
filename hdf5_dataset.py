@@ -5,7 +5,7 @@ import numpy as np
 import h5py
 from zipfile import ZipFile
 from time import time
-import tqdm
+
 
 Datasets = collections.namedtuple('Datasets', ['train', 'validation'])
 
