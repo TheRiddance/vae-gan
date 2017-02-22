@@ -10,7 +10,7 @@ import hdf5_dataset
 flags = tf.app.flags
 
 flags.DEFINE_string("model", "GAN", "choose a model: GAN or VAE")
-flags.DEFINE_string("samples_dir", "datasets/", "sample data dir")
+flags.DEFINE_string("dataset", "datasets/", "sample data dir")
 flags.DEFINE_string("data_dir", "data/", "checkpoint and logging data dir")
 flags.DEFINE_integer("batch_size", 128, "batch size")
 flags.DEFINE_integer("image_size", 64, "image size")
@@ -23,7 +23,7 @@ FLAGS = flags.FLAGS
 
 
 def main(_):
-    train_data = hdf5_dataset.read_data_set(FLAGS.samples_dir, image_size=FLAGS.image_size, shape=FLAGS.image_size * FLAGS.image_size, binarized=True).train
+    train_data = hdf5_dataset.read_data_set(FLAGS.dataset, image_size=FLAGS.image_size, shape=FLAGS.image_size * FLAGS.image_size, binarized=True).train
 
     if FLAGS.model == "VAE":
         model = VAE(FLAGS.hidden_size, FLAGS.batch_size, FLAGS.learning_rate, image_size=FLAGS.image_size)
