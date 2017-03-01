@@ -28,6 +28,10 @@ class VAE_GAN:
         with tf.variable_scope("encode"):
             self.z_x_mean, self.z_x_log_sigma_sq = self._encoder(self.x, hidden_size)  # get z from the input
 
+            # summary
+            with tf.name_scope("latent_space_summary"):
+                tf.summary.tensor_summary("z_x_mean", self.z_x_mean)
+
         with tf.variable_scope("generate"):
             self.z_x = tf.add(self.z_x_mean, tf.mul(tf.sqrt(tf.exp(self.z_x_log_sigma_sq)), self.eps))  # grab our actual z
             self.x_tilde = self._generator(self.z_x)
@@ -61,6 +65,10 @@ class VAE_GAN:
             # Lth Layer Loss - the 'learned similarity measure'
             self.LL_loss = tf.reduce_sum(tf.square(l_x - l_x_tilde))/(image_size * image_size)
 
+            # summary
+            with tf.name_scope("loss_summary"):
+                tf.summary.histogram("LL_loss", self.LL_loss)
+
         with tf.variable_scope("optimizer"):
 
             # specify loss to parameters
@@ -88,20 +96,33 @@ class VAE_GAN:
             grads = optimizer_D.compute_gradients(L_d, var_list=D_params)
             self.train_D = optimizer_D.apply_gradients(grads, global_step=self.global_step)
 
+        # check tensors
+        self._check_tensors()
+
+        # init session
         self.sess = tf.Session()
+
+        self.merged_summary_op = tf.summary.merge_all()
+        self.summary_writer = tf.summary.FileWriter(os.path.join("tensorbaord", self.experiment_name), self.sess.graph)
+
         self.sess.run(tf.global_variables_initializer())
 
     def _encoder(self, input_tensor, output_size, image_size=64):
         batch_size = input_tensor.get_shape().as_list()[0]
         net = tf.reshape(input_tensor, [batch_size, image_size, image_size, 1])
-        net = model_ops.conv2d(net, 32, stride=2, name="enc_conv1")
-        net = model_ops.conv2d(net, 64, stride=2, name="enc_conv2")
-        net = model_ops.conv2d(net, 128, stride=2, padding='VALID', name="enc_conv3")
-        net = tf.nn.dropout(net, keep_prob=0.9)
+        net1 = model_ops.conv2d(net, 32, stride=2, name="enc_conv1")
+        net2 = model_ops.conv2d(net1, 64, stride=2, name="enc_conv2")
+        net3 = model_ops.conv2d(net2, 128, stride=2, padding='VALID', name="enc_conv3")
+        net = tf.nn.dropout(net3, keep_prob=0.9)
         net = tf.reshape(net, [batch_size, -1])
         net = model_ops.linear(net, 2 * output_size, "enc_fully")
         z_mean = net[:, :output_size]
         z_log_sigma_q = net[:, output_size:]
+
+        # summary
+        with tf.name_scope("encoder_summary"):
+            tf.summary.image("net1",  tf.expand_dims(tf.reduce_mean(net1, axis=-1), axis=-1))
+
         return z_mean, z_log_sigma_q
 
     def _generator(self, input_tensor):
@@ -127,11 +148,21 @@ class VAE_GAN:
         D = model_ops.linear(tf.nn.sigmoid(lth_layer), 1, "dis_fully_d")
         return D, lth_layer
 
+    def _check_tensors(self):
+        if tf.trainable_variables():
+            for v in tf.trainable_variables():
+                print("%s : %s" % (v.name, v.get_shape()))
+
     def update_params(self, x):
         _, _, _, D_err, G_err, KL_err, LL_err, d_fake, d_real = self.sess.run([
             self.train_E, self.train_G, self.train_D,
             self.D_loss, self.G_loss, self.KL_loss, self.LL_loss,
             self.d_x_p, self.d_x], feed_dict={self.x: x})
+
+        # summary update
+        summary = self.sess.run(self.merged_summary_op, feed_dict={self.x: x})
+        self.summary_writer.add_summary(summary, global_step=tf.train.global_step(self.sess, self.global_step))
+
         return D_err, G_err, KL_err, LL_err, d_fake, d_real
 
     def generate_and_save_images(self, num_samples, directory, epoch, x):
