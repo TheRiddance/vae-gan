@@ -29,8 +29,8 @@ class VAE_GAN:
             self.z_x_mean, self.z_x_log_sigma_sq = self._encoder(self.x, hidden_size)  # get z from the input
 
             # summary
-            with tf.name_scope("latent_space_summary"):
-                tf.summary.tensor_summary("z_x_mean", self.z_x_mean)
+            #with tf.name_scope("latent_space_summary"):
+            #    tf.summary.tensor_summary("z_x_mean", self.z_x_mean)
 
         with tf.variable_scope("generate"):
             self.z_x = tf.add(self.z_x_mean, tf.mul(tf.sqrt(tf.exp(self.z_x_log_sigma_sq)), self.eps))  # grab our actual z
