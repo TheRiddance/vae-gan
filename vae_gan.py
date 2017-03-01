@@ -103,7 +103,7 @@ class VAE_GAN:
         self.sess = tf.Session()
 
         self.merged_summary_op = tf.summary.merge_all()
-        self.summary_writer = tf.summary.FileWriter(os.path.join("tensorbaord", self.experiment_name), self.sess.graph)
+        self.summary_writer = tf.summary.FileWriter(os.path.join("tensorboard", self.experiment_name), self.sess.graph)
 
         self.sess.run(tf.global_variables_initializer())
 
