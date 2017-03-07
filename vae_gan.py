@@ -14,7 +14,7 @@ from visualizer import ReconstructionVisualizer
 
 class VAE_GAN:
 
-    def __init__(self, batch_size, hidden_size, e_learning_rate=5e-4, g_learning_rate=5e-4, d_learning_rate=5e-4, image_size=64):
+    def __init__(self, hidden_size, e_learning_rate=5e-4, g_learning_rate=5e-4, d_learning_rate=5e-4, image_size=64):
         self.experiment_name = "VAE-GAN_" + strftime("%Y%m%d_%H%M%S")
 
         self.image_size = image_size

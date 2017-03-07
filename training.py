@@ -30,7 +30,7 @@ def main(_):
     elif FLAGS.model == "GAN":
         model = GAN(FLAGS.hidden_size, FLAGS.batch_size, FLAGS.learning_rate, image_size=FLAGS.image_size)
     elif FLAGS.model == "VAE-GAN":
-        model = VAE_GAN(FLAGS.batch_size, FLAGS.hidden_size, FLAGS.learning_rate, FLAGS.learning_rate, FLAGS.learning_rate, image_size=FLAGS.image_size)
+        model = VAE_GAN(FLAGS.hidden_size, FLAGS.learning_rate, FLAGS.learning_rate, FLAGS.learning_rate, image_size=FLAGS.image_size)
     else:
         print("this model is not supported")
         return

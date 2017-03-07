@@ -32,7 +32,8 @@ class HDF5_DataSet:
             if len(image_batch) == batch_size:
                 yield np.array(image_batch)
                 image_batch = []
-        # TODO: yield remaining
+        if len(image_batch) > 0:
+            yield np.array(image_batch)
         # all examples seen, shuffle data again<
         self.shuffle_data()
 
