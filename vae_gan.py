@@ -5,6 +5,7 @@
 """
 
 import os
+from tensorflow.contrib import layers
 import tensorflow as tf
 from time import strftime
 
@@ -19,18 +20,17 @@ class VAE_GAN:
 
         self.image_size = image_size
 
-        self.x = tf.placeholder(tf.float32, [batch_size, image_size * image_size])
-        self.z_p = tf.random_normal((batch_size, hidden_size), 0, 1)  # normal dist for GAN
-        self.eps = tf.random_normal((batch_size, hidden_size), 0, 1)  # normal dist for VAE
+        self.x = tf.placeholder(tf.float32, [None, image_size * image_size])
+
+        self.batch_size = tf.shape(self.x)[0]
+
+        self.z_p = tf.random_normal((self.batch_size, hidden_size), 0, 1)  # normal dist for GAN
+        self.eps = tf.random_normal((self.batch_size, hidden_size), 0, 1)  # normal dist for VAE
 
         self.global_step = tf.Variable(0, name='global_step', trainable=False)
 
         with tf.variable_scope("encode"):
             self.z_x_mean, self.z_x_log_sigma_sq = self._encoder(self.x, hidden_size)  # get z from the input
-
-            # summary
-            #with tf.name_scope("latent_space_summary"):
-            #    tf.summary.tensor_summary("z_x_mean", self.z_x_mean)
 
         with tf.variable_scope("generate"):
             self.z_x = tf.add(self.z_x_mean, tf.mul(tf.sqrt(tf.exp(self.z_x_log_sigma_sq)), self.eps))  # grab our actual z
@@ -108,14 +108,13 @@ class VAE_GAN:
         self.sess.run(tf.global_variables_initializer())
 
     def _encoder(self, input_tensor, output_size, image_size=64):
-        batch_size = input_tensor.get_shape().as_list()[0]
-        net = tf.reshape(input_tensor, [batch_size, image_size, image_size, 1])
-        net1 = model_ops.conv2d(net, 32, stride=2, name="enc_conv1")
-        net2 = model_ops.conv2d(net1, 64, stride=2, name="enc_conv2")
-        net3 = model_ops.conv2d(net2, 128, stride=2, padding='VALID', name="enc_conv3")
+        net = tf.reshape(input_tensor, [self.batch_size, image_size, image_size, 1])
+        net1 = layers.conv2d(net, 32, 5, stride=2)
+        net2 = layers.conv2d(net1, 64, 5, stride=2)
+        net3 = layers.conv2d(net2, 128, 5, stride=2, padding='VALID')
         net = tf.nn.dropout(net3, keep_prob=0.9)
-        net = tf.reshape(net, [batch_size, -1])
-        net = model_ops.linear(net, 2 * output_size, "enc_fully")
+        net = layers.flatten(net)
+        net = layers.fully_connected(net, 2 * output_size)
         z_mean = net[:, :output_size]
         z_log_sigma_q = net[:, output_size:]
 
@@ -126,26 +125,25 @@ class VAE_GAN:
         return z_mean, z_log_sigma_q
 
     def _generator(self, input_tensor):
-        batch_size = input_tensor.get_shape().as_list()[0]
         net = tf.expand_dims(input_tensor, 1)
         net = tf.expand_dims(net, 1)
-        net = model_ops.conv2d_back(net, [batch_size, 8, 8, 128], kernel=8, padding='VALID', name="gen_conv1")
-        net = model_ops.conv2d_back(net, [batch_size, 16, 16, 64], stride=2, name="gen_conv2")
-        net = model_ops.conv2d_back(net, [batch_size, 32, 32, 32], stride=2, name="gen_conv3")
-        net = model_ops.conv2d_back(net, [batch_size, 64, 64, 1], stride=2, name="gen_conv4")
+        net = layers.conv2d_transpose(net, 128, 8, padding='VALID')
+        net = layers.conv2d_transpose(net, 64, 5, stride=2)
+        net = layers.conv2d_transpose(net, 32, 5, stride=2)
+        net = layers.conv2d_transpose(net, 1, 5, stride=2)
         net = tf.nn.sigmoid(net)
-        return tf.reshape(net, [batch_size, -1])
+        net = layers.flatten(net)
+        return net
 
     def _discriminator(self, input_tensor, image_size=64):
-        batch_size = input_tensor.get_shape().as_list()[0]
-        net = tf.reshape(input_tensor, [batch_size, image_size, image_size, 1])
-        net = model_ops.conv2d(net, 32, stride=2, name="dis_conv1")
-        net = model_ops.conv2d(net, 64, stride=2, name="dis_conv2")
-        net = model_ops.conv2d(net, 128, stride=2, padding='VALID', name="dis_conv3")
+        net = tf.reshape(input_tensor, [self.batch_size, image_size, image_size, 1])
+        net = layers.conv2d(net, 32, 5, stride=2)
+        net = layers.conv2d(net, 64, 5, stride=2)
+        net = layers.conv2d(net, 128, 5, stride=2, padding='VALID')
         net = tf.nn.dropout(net, keep_prob=0.9)
-        net = tf.reshape(net, [batch_size, -1])
-        lth_layer = model_ops.linear(tf.nn.elu(net), 1024, "dis_fully_lth")
-        D = model_ops.linear(tf.nn.sigmoid(lth_layer), 1, "dis_fully_d")
+        net = layers.flatten(net)
+        lth_layer = layers.fully_connected(net, 1024, activation_fn=tf.nn.elu)
+        D = layers.fully_connected(lth_layer, 1, activation_fn=tf.nn.sigmoid)
         return D, lth_layer
 
     def _check_tensors(self):

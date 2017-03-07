@@ -17,7 +17,7 @@ def conv2d(input_, output_dim, kernel=5, stride=1, stddev=0.02, padding='SAME', 
         conv = tf.nn.conv2d(input_, weights, strides=[1, stride, stride, 1], padding=padding)
 
         biases = tf.get_variable('biases', [output_dim], initializer=tf.constant_initializer(0.0))
-        conv = tf.reshape(tf.nn.bias_add(conv, biases), conv.get_shape())
+        conv = tf.reshape(tf.nn.bias_add(conv, biases), tf.shape(conv))
 
         return tf.nn.elu(batch_norm(conv))
 
@@ -34,9 +34,8 @@ def conv2d_back(input_, output_shape, kernel=5, stride=1, stddev=0.02, padding='
 
 
 def linear(input_, output_size, scope="linear", stddev=0.02):
-    shape = input_.get_shape().as_list()
     with tf.variable_scope(scope):
-        weights = tf.get_variable('weights', [shape[1], output_size], dtype=tf.float32, initializer=tf.random_normal_initializer(stddev=stddev))
+        weights = tf.get_variable('weights', [input_.get_shape()[-1], output_size], dtype=tf.float32, initializer=tf.random_normal_initializer(stddev=stddev), validate_shape=False)
         bias = tf.get_variable('bias', [output_size], initializer=tf.constant_initializer(0.0))
 
         return tf.matmul(input_, weights) + bias
