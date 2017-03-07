@@ -20,7 +20,7 @@ class VAE:
             input_stddev = tf.sqrt(tf.exp(encoded[:, hidden_size:]))
 
             epsilon = tf.random_normal([batch_size, hidden_size])
-            input_sample = tf.add(input_mean, tf.mul(tf.sqrt(tf.exp(input_stddev)), epsilon))
+            input_sample = tf.add(input_mean, tf.multiply(tf.sqrt(tf.exp(input_stddev)), epsilon))
 
             self.output_reconstr = self._decoder(input_sample, batch_size)
 

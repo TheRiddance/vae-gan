@@ -33,7 +33,7 @@ class VAE_GAN:
             self.z_x_mean, self.z_x_log_sigma_sq = self._encoder(self.x, hidden_size)  # get z from the input
 
         with tf.variable_scope("generate"):
-            self.z_x = tf.add(self.z_x_mean, tf.mul(tf.sqrt(tf.exp(self.z_x_log_sigma_sq)), self.eps))  # grab our actual z
+            self.z_x = tf.add(self.z_x_mean, tf.multiply(tf.sqrt(tf.exp(self.z_x_log_sigma_sq)), self.eps))  # grab our actual z
             self.x_tilde = self._generator(self.z_x)
 
         with tf.variable_scope("discriminate"):
