@@ -9,7 +9,6 @@ from tensorflow.contrib import layers
 import tensorflow as tf
 from time import strftime
 
-import model_ops
 from visualizer import ReconstructionVisualizer
 
 
