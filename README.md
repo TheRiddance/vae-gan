@@ -16,11 +16,11 @@ The variational autoencoder uses the same 2D convolutions for encoding and decod
 ## VAE-GAN
 
 For this implementation I could rely on this well written tutorial by *timsainb* (https://github.com/timsainb/Tensorflow-MultiGPU-VAE-GAN).
-A bit more complicated.
+Which is a bit more complicated.
 
 ## Dependencies
 
-* Tensorflow
+* Tensorflow 1.0
 * Numpy
 * Scipy
 * Matplotlib
