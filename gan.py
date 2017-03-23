@@ -11,7 +11,7 @@ class GAN:
 
     def __init__(self, batch_size, hidden_size=256, learning_rate=1e-3, beta1=0.5, image_size=64):
         self.image_size = image_size
-        self.input_tensor = tf.placeholder(tf.float32, [None, image_size * image_size])
+        self.input_tensor = tf.placeholder(tf.float32, [batch_size, image_size * image_size])
 
         with tf.variable_scope("model"):
             self.G = self._generator(tf.random_normal([batch_size, hidden_size]), batch_size)
@@ -85,5 +85,5 @@ class GAN:
         visualizer.save_generated_samples(generated_samples, epoch)
 
     def print_loss(self, input_tensor, epoch):
-        d_loss, g_loss = self.sess.run([self.d_loss, self.g_loss], feed_dict={self.input_tensor: input_tensor})
-        print("epoch: %3d" % epoch, "D loss %.4f" % d_loss, "G loss  %.4f" % g_loss)
+        d_real, d_fake, d_loss, g_loss = self.sess.run([self.d_loss_real, self.d_loss_fake, self.d_loss, self.g_loss], feed_dict={self.input_tensor: input_tensor})
+        print("epoch: %3d" % epoch, "D loss real: %.4f" % d_real, "D loss fake: %.4f" % d_fake, "D loss: %.4f" % d_loss, "G loss: %.4f" % g_loss)
