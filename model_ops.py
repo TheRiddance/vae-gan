@@ -24,7 +24,7 @@ def conv2d(input_, output_dim, kernel=5, stride=1, stddev=0.02, padding='SAME', 
 
 def conv2d_back(input_, output_shape, kernel=5, stride=1, stddev=0.02, padding='SAME', name="deconv2d"):
     with tf.variable_scope(name):
-        weights = tf.get_variable('weights', [kernel, kernel, output_shape[-1], input_.get_shape()[-1]], initializer=tf.random_normal_initializer(stddev=stddev))
+        weights = tf.get_variable('weights', [kernel, kernel, output_shape[-1], input_.get_shape().as_list()[-1]], initializer=tf.random_normal_initializer(stddev=stddev))
         deconv = tf.nn.conv2d_transpose(input_, weights, output_shape=output_shape, strides=[1, stride, stride, 1], padding=padding)
 
         biases = tf.get_variable('biases', [output_shape[-1]], initializer=tf.constant_initializer(0.0))
@@ -35,7 +35,7 @@ def conv2d_back(input_, output_shape, kernel=5, stride=1, stddev=0.02, padding='
 
 def linear(input_, output_size, scope="linear", stddev=0.02):
     with tf.variable_scope(scope):
-        weights = tf.get_variable('weights', [input_.get_shape()[-1], output_size], dtype=tf.float32, initializer=tf.random_normal_initializer(stddev=stddev), validate_shape=False)
+        weights = tf.get_variable('weights', [input_.get_shape().as_list()[-1], output_size], dtype=tf.float32, initializer=tf.random_normal_initializer(stddev=stddev))
         bias = tf.get_variable('bias', [output_size], initializer=tf.constant_initializer(0.0))
 
         return tf.matmul(input_, weights) + bias
