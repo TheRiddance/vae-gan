@@ -1,13 +1,14 @@
+from tensorflow.contrib import layers
 import tensorflow as tf
 
 
 def batch_norm(x, epsilon=1e-5, momentum=0.9, name="batch_norm"):
-    return tf.contrib.layers.batch_norm(x,
-                                        decay=momentum,
-                                        updates_collections=None,
-                                        epsilon=epsilon,
-                                        scale=True,
-                                        scope=name)
+    return layers.batch_norm(x,
+                             decay=momentum,
+                             updates_collections=None,
+                             epsilon=epsilon,
+                             scale=True,
+                             scope=name)
 
 
 def conv2d(input_, output_dim, kernel=5, stride=1, stddev=0.02, padding='SAME', name="conv2d"):
@@ -39,3 +40,10 @@ def linear(input_, output_size, scope="linear", stddev=0.02):
         bias = tf.get_variable('bias', [output_size], initializer=tf.constant_initializer(0.0))
 
         return tf.matmul(input_, weights) + bias
+
+def linear_contrib(inputs, output_size, activation_fn=None, scope="linear", stddev=0.02):
+    with tf.variable_scope(scope):
+        return layers.fully_connected(inputs, output_size,
+                                      activation_fn=activation_fn,
+                                      weights_initializer=tf.random_normal_initializer(stddev=stddev),
+                                      biases_initializer=tf.constant_initializer(0.0))

@@ -40,7 +40,6 @@ class GAN:
         self.sess.run(tf.global_variables_initializer())
 
     def _discriminator(self, input_tensor, batch_size, output_size=1, image_size=64):
-
         net = tf.reshape(input_tensor, [batch_size, image_size, image_size, 1])
         net = model_ops.conv2d(net, 32, stride=2, name="dis_conv1")
         net = model_ops.conv2d(net, 64, stride=2, name="dis_conv2")
@@ -49,8 +48,8 @@ class GAN:
         net = tf.reshape(net, [batch_size, -1])
         return model_ops.linear(net, output_size, "dis_fully")
 
-    def _generator(self, input_tensor, batch_size):
 
+    def _generator(self, input_tensor, batch_size):
         net = tf.expand_dims(input_tensor, 1)
         net = tf.expand_dims(net, 1)
         net = model_ops.conv2d_back(net, [batch_size, 8, 8, 128], kernel=8, padding='VALID', name="gen_conv1")
@@ -63,9 +62,6 @@ class GAN:
     def update_params(self, input_tensor):
         # Update D network
         _ = self.sess.run([self.d_optim], feed_dict={self.input_tensor: input_tensor})
-
-        # Update G network
-        _ = self.sess.run([self.g_optim])
 
         # Run g_optim twice to make sure that d_loss does not go to zero (different from paper)
         _ = self.sess.run([self.g_optim])
@@ -84,6 +80,6 @@ class GAN:
         visualizer = ImageVisualizer(experiment_dir, image_size=self.image_size)
         visualizer.save_generated_samples(generated_samples, epoch)
 
-    def print_loss(self, input_tensor, epoch):
+    def loss_msg(self, input_tensor, epoch):
         d_real, d_fake, d_loss, g_loss = self.sess.run([self.d_loss_real, self.d_loss_fake, self.d_loss, self.g_loss], feed_dict={self.input_tensor: input_tensor})
-        print("epoch: %3d" % epoch, "D loss real: %.4f" % d_real, "D loss fake: %.4f" % d_fake, "D loss: %.4f" % d_loss, "G loss: %.4f" % g_loss)
+        return "epoch: %3d" % epoch + " discriminator loss real: %.4f" % d_real + " discriminator D loss fake: %.4f" % d_fake + " discriminator loss: %.4f" % d_loss + " generator loss: %.4f" % g_loss
